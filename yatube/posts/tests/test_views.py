@@ -1,10 +1,8 @@
 from django import forms
+from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.cache import cache
-
-from posts.models import Group, Post, Follow, User
+from posts.models import Follow, Group, Post, User
 
 LIMIT_POST = 10
 
