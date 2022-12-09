@@ -101,6 +101,7 @@ class PostURLTests(TestCase):
         """Проверяем доступность шаблонов и доступа к страницам
          для гостевого пользователя, включая переадресацию."""
 
+        cache.clear()
         templates_url_location = {
             '/': 'posts/index.html',
             f'/group/{self.group.slug}/': 'posts/group_list.html',
