@@ -3,6 +3,8 @@ from django.db import models
 
 User = get_user_model()
 
+VIEW_LENGTH = 15
+
 
 class Group(models.Model):
     title = models.CharField(
@@ -54,25 +56,31 @@ class Post(models.Model):
         verbose_name_plural = 'Посты'
 
     def __str__(self):
-        return self.text[:15]
+        return self.text[:VIEW_LENGTH]
 
 
 class Comment(models.Model):
     post = models.ForeignKey(
         Post,
         related_name="comments",
-        on_delete=models.SET_NULL,
-        null=True,
+        on_delete=models.CASCADE,
     )
     author = models.ForeignKey(
         User, related_name="comments",
         on_delete=models.CASCADE,
-        null=True
     )
     text = models.TextField(
         verbose_name="Текст комментария",
     )
     created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created',)
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
+    def __str__(self):
+        return self.text[:VIEW_LENGTH]
 
 
 class Follow(models.Model):
@@ -80,11 +88,16 @@ class Follow(models.Model):
         User,
         related_name="follower",
         on_delete=models.CASCADE,
-        null=True,
     )
     author = models.ForeignKey(
         User,
         related_name="following",
         on_delete=models.CASCADE,
-        null=True
     )
+
+    class Meta:
+        verbose_name = 'Подписки'
+        verbose_name_plural = 'Подписки'
+
+    def __str__(self):
+        return self.text[:VIEW_LENGTH]

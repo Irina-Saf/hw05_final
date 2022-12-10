@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.shortcuts import render
 
 
@@ -11,4 +13,8 @@ def csrf_failure(request, reason=''):
 
 
 def server_error(request):
-    return render(request, "core/500.html", status=500)
+    return render(request, "core/500.html", status=HTTPStatus.NOT_FOUND)
+
+
+def permission_denied(request, exception):
+    return render(request, 'core/403.html', status=HTTPStatus.FORBIDDEN)

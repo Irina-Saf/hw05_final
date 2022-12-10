@@ -3,6 +3,7 @@ from http import HTTPStatus
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import Client, TestCase
+
 from posts.models import Group, Post
 
 User = get_user_model()
@@ -84,6 +85,7 @@ class PostURLTests(TestCase):
             f'/profile/{self.user.username}/': 'posts/profile.html',
             f'/posts/{self.post.id}/': 'posts/post_detail.html',
             '/create/': 'posts/create.html',
+            '/follow/': 'posts/follow.html',
         }
 
         for adress, template in templates_url_names.items():
@@ -117,6 +119,9 @@ class PostURLTests(TestCase):
 
         response = self.guest_client.get('/create/', follow=True)
         self.assertRedirects(response, ('/auth/login/?next=/create/'))
+
+        response = self.guest_client.get('/follow/', follow=True)
+        self.assertRedirects(response, ('/auth/login/?next=/follow/'))
 
         response = self.guest_client.get(
             f'/posts/{self.post.id}/edit/', follow=True)

@@ -2,7 +2,8 @@ from django import forms
 from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
-from posts.models import Follow, Group, Post, User
+
+from posts.models import Follow, Group, Post, Comment, User
 
 LIMIT_POST = 10
 
@@ -46,6 +47,7 @@ class PostPagesTests(TestCase):
             reverse('posts:post_edit', kwargs={'post_id': self.post.id}):
             ('posts/create.html'),
             reverse('posts:post_create'): 'posts/create.html',
+            reverse('posts:follow_index'): 'posts/follow.html',
         }
 
         for reverse_name, template in templates_page_names.items():
@@ -113,6 +115,9 @@ class PostPagesTests(TestCase):
 
         self.assertEqual(response.context.get('post'), self.post)
 
+        form_field = response.context.get('form').fields.get('text')
+        self.assertIsInstance(form_field, forms.fields.CharField)
+
     def test_post_edit_show_correct_context(self):
         """Шаблон post_edit сформирован с правильным контекстом."""
 
@@ -129,6 +134,9 @@ class PostPagesTests(TestCase):
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
+
+        response = (self.authorized_client.get(reverse(
+            'posts:add_comment', kwargs={'post_id': self.post.id})))
 
     def test_create_post_show_correct_context(self):
         """Шаблон create_post показывает правильный контекстом."""
@@ -155,12 +163,14 @@ class PostPagesTests(TestCase):
             text="Текст для теста кеширования.",
         )
         # Проверка views на кеширование
+        response_before = self.authorized_client.get(reverse("posts:index"))
         cache.clear()
         response_with = self.authorized_client.get(reverse("posts:index"))
         self.assertIn(new_post, response_with.context["page_obj"])
         new_post.delete()
         response_without = self.authorized_client.get(reverse("posts:index"))
         self.assertEqual(response_with.content, response_without.content)
+        self.assertNotEqual(response_before, response_with)
 
     def test_follow_page_(self):
         """Авторизированный автор может подписаться."""
@@ -181,13 +191,14 @@ class PostPagesTests(TestCase):
 
     def test_unfollow_page_(self):
         """Авторизированный автор может отписаться."""
-        self.authorized_client.post(
-            reverse(
-                "posts:profile_follow",
-                kwargs={"username": str(PostPagesTests.user_two)},
-            )
+
+        self.follow = Follow.objects.create(
+            user=PostPagesTests.user,
+            author=PostPagesTests.user_two
         )
+
         Follow_count = Follow.objects.count()
+
         self.authorized_client.post(
             reverse(
                 "posts:profile_unfollow",
