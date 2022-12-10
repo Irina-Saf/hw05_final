@@ -85,5 +85,5 @@ class CommentModelTest(TestCase):
         self.assertEqual(
             comment._meta.get_field('text').verbose_name, 'Текст комментария')
 
-        expected_object_name = comment.text[:POST_TITLE_LENGHT]   
+        expected_object_name = comment.text[:POST_TITLE_LENGHT]
         self.assertEqual(str(comment), expected_object_name)

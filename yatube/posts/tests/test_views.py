@@ -3,7 +3,7 @@ from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from posts.models import Follow, Group, Post, Comment, User
+from posts.models import Follow, Group, Post, User
 
 LIMIT_POST = 10
 
