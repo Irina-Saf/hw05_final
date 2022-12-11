@@ -104,14 +104,14 @@ class PostURLTests(TestCase):
          для гостевого пользователя, включая переадресацию."""
 
         cache.clear()
-        templates_url_location = {
+        templates_url_names = {
             '/': 'posts/index.html',
             f'/group/{self.group.slug}/': 'posts/group_list.html',
             f'/profile/{self.user.username}/': 'posts/profile.html',
             f'/posts/{self.post.id}/': 'posts/post_detail.html',
         }
 
-        for adress, template in templates_url_location.items():
+        for adress, template in templates_url_names.items():
             with self.subTest(adress=adress):
                 response = self.guest_client.get(adress)
                 self.assertTemplateUsed(response, template)

@@ -195,7 +195,9 @@ class PostFormTests(TestCase):
         self.cheking_context(expect_answer)
 
     def test_create_comment(self):
-        """Форма создает комментарий."""
+        """Форма создает комментарий только
+         для авторизованного пользователя."""
+
         comment_count = Comment.objects.count()
         form_data = {
             'text': 'о боже, эти тесты... памахите'
@@ -208,6 +210,17 @@ class PostFormTests(TestCase):
             data=form_data,
             follow=True
         )
+
+        self.guest_client = Client()
+        self.guest_client.post(
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': PostFormTests.post.id}
+            ),
+            data=form_data,
+            follow=True
+        )
+
         comment = Comment.objects.first()
         self.assertRedirects(response, reverse(
             'posts:post_detail',

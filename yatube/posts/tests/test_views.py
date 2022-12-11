@@ -192,7 +192,7 @@ class PostPagesTests(TestCase):
     def test_unfollow_page_(self):
         """Авторизированный автор может отписаться."""
 
-        self.follow = Follow.objects.create(
+        Follow.objects.create(
             user=PostPagesTests.user,
             author=PostPagesTests.user_two
         )
